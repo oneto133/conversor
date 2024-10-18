@@ -1,7 +1,16 @@
 from IPython.display import clear_output
 from time import sleep
 import datetime, pytz, os
+from tkinter import filedialog, messagebox
+import pdf2docx
+from PIL import ImageTk, Image
+
 class Funcao():
+  def __init__(self):
+    pass
+
+
+
   def hora(self):
     '''
     Formatting the time because when using the datetime, it was getting a different time zone
@@ -139,12 +148,48 @@ class Funcao():
     valor = valor.replace(",", ".")
     return valor
 
-def Verificar_se_existe_o_arquivo(arquivo):
-    '''Vai na memóriado sistema operacional buscar o arquivo com o caminho fornecido, se o caminho existir, 
-  retorna que sim, se não, retorna que não'''
-    if os.path.exists(arquivo):
-        return f"O Arquivo '{arquivo}' existe"
-    else:
-        print(f"O arquivo '{arquivo}'não existe...")
-        
-        return '1'
+  def Verificar_se_existe_o_arquivo(self, arquivo):
+      '''Vai na memóriado sistema operacional buscar o arquivo com o caminho fornecido, se o caminho existir, 
+    retorna que sim, se não, retorna que não'''
+      if os.path.exists(arquivo):
+          return f"O Arquivo '{arquivo}' existe"
+      else:
+          print(f"O arquivo '{arquivo}'não existe...")
+          
+          return '1'
+  def abrir_gerenciador_de_arquivos(self, caminho='diretorios.csv'):
+    '''
+    Criando um arquivo de cache
+    '''
+    with open(f'{caminho}', 'w') as dircsv:
+        destino = filedialog.askopenfilenames()
+        dircsv.write(f'{destino}\n')
+
+  def ler_arquivo_em_cache(self, caminho='diretorios.csv'):
+    '''
+    Fonecer crie um arquivo em cache, se não criar, será usado um arquivo padrão
+    ex, c:caminho.csv
+    '''
+    with open(f'{caminho}', 'r') as local:
+      for c in local:
+          if c[0] == '(':
+              if c[2:-4] == "":
+                return "vazio"
+              else:
+                return c[2:-4]
+
+class Graficos:
+  def __init__(self):
+    pass
+
+
+  def Adicionar_imagens_nas_telas(self, imagem, altura=30, largura=30):
+    """
+    Adiciona imagens nas telas
+    imagem: Fornceça o caminho da imagem
+    altura: forneça a altura, padrão 30
+    """
+    self.imagem = Image.open(imagem)
+    self.imagem = self.imagem.resize((altura, largura))
+    self.foto= ImageTk.PhotoImage(self.imagem)
+    return self.foto

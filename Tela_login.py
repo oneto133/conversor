@@ -1,5 +1,4 @@
 #Arquivo telalogin.py
-
 from tkinter import *
 from PIL import ImageTk, Image
 import connection_with_db as conn
@@ -52,18 +51,28 @@ class Tela_De_Login:
 
     def Pegar_dados(self, event):
         self.clicar_botao()
+        self.janela.update()
 
     def abre_a_tela_principal(self):
         self.tela_principal = Toplevel(self.janela)
+        self.tela_principal.protocol("WM_DELETE_WINDOW", self.fechar_programa)
         main.MeuAplicativo(self.tela_principal)
+    
+
+    def fechar_programa(self):
+        self.janela.quit()
+        self.janela.destroy()
 
         
     def clicar_botao(self):
         dado = self.Users_Entry.get()
         consulta = conn.Query()
+        self.janela.update()
         self.senha = consulta.consultar_senha_por_usuario(dado)
+        self.janela.update()
         if self.senha == self.Password_Entry.get():
             self.Mensagem_de_alerta['text'] = "tudo certo"
+
             self.janela.withdraw()
             self.abre_a_tela_principal()
 

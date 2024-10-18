@@ -1,12 +1,12 @@
-
 #arquivo main.py
-
 from pdf2docx import Converter as pdf
 from tkinter import *
-import sys
-sys.path.append(r'C:\Users\PortifolioUnopar')
 import Funções
-from random import choice
+from Funções import Funcao, Graficos
+from tkinter import filedialog
+from PIL import ImageTk, Image
+from tkinter import dnd, ttk
+
 
 class MeuAplicativo():
     def __init__(self, janela):
@@ -20,31 +20,48 @@ class MeuAplicativo():
 
 
     def Tipo_de_Arquivo(self):
-        print('teste')
-        qual_o_tipo = Label(self.janela,text = "Qual o tipo de arquivo que você quer converter? ", bg= 'white', fg = 'black', font='bold')
-        qual_o_tipo.pack()
-        print('teste')
-        self.tipo_de_arquivo = Entry(self.janela)
-        self.tipo_de_arquivo.pack()
-        self.botão_arquivo = Button(self.janela,text='Ok', command=self.obter_valor, width=6, height=1)
-        self.botão_arquivo.pack()
-        self.mensagem_ok = Label(self.janela, text='', bg='white', fg='black')
-        self.mensagem_ok.pack
+        self.botão_arquivo = Button(
+                                    self.janela,text='selecionar arquivo', 
+                                    command=self.abrir_gerenciador, width=15, height=1
+                                    )
+        self.botão_arquivo.place(x=200, y=50)
+        self.frame = Frame(self.janela, bg='black', width=500, height=200, bd=2, relief='groove')
+        self.frame.place(x=0, y=150)
         
-    def obter_valor(self):
-        valor = self.tipo_de_arquivo.get()
-        encontrado = False
-        with open('arquivos.txt', 'r') as arquivo:
-            for linha in arquivo:
-                if linha.strip() == valor:
-                    self.mensagem_ok['text'] = f"Ok! {linha}"
-                    print('ok')
-                    self.Código()
-                    encontrado = True
-                    break
-        if not encontrado:
-            self.mensagem_ok['text'] = f"Arquivo no formato '{valor}' não encontrado, insira novamente..."
-        
+
+
+    def abrir_gerenciador(self):
+        funcao = Funcao()
+        funcao.abrir_gerenciador_de_arquivos()
+        arquivo = funcao.ler_arquivo_em_cache()
+        if arquivo == "vazio":
+            pass
+        else:
+            self.mensagem_ok = Label(
+                                    self.janela, text=f'Selecione o arquivo de destino ->',
+                                    bg='black', fg='white', font=('Arial', 10, 'bold')
+                                    )
+            self.mensagem_ok.place(x=140, y=170)
+            imagem = Graficos()
+            self.foto = imagem.Adicionar_imagens_nas_telas(r"C:\conversorpdf\conversor\pdf.png", 50, 60)
+            self.rotulo = Label(self.janela, image=self.foto, bg='black')
+            self.rotulo.place(x=70, y=160)
+
+            opções = [
+                'PDF',
+                'DOCX'
+            ]
+            self.combobox = ttk.Combobox(
+
+                self.janela, values=opções, 
+                background='black', foreground='black'
+            
+            )
+            self.combobox.set('Selecionar')
+            self.combobox.place(x=350, y=170)
+            
+
+            
 
     def Código(self):
         self.arquivo = input("Qual o nome do arquivo em pdf? ")

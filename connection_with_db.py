@@ -51,6 +51,6 @@ if __name__ == '__main__':
 '''
     #consultando dados  
     consulta = Query()
-    resultado= consulta.csche('admin')
+    resultado= consulta.consultar_senha_por_usuario('admin')
     print(resultado)
 

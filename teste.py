@@ -4,7 +4,7 @@ import os
 
 mensagem = messagebox.askyesno(title='Adcionar linha?', message='Gostaria de selecionar um par de origem e destino?')
 
-with open(os.path.join('input', 'diretorios.csv'), 'w') as dircsv:
+with open('diretorios.csv', 'w') as dircsv:
     dircsv.write('origem,destino\n')
 
     while mensagem:
@@ -14,7 +14,7 @@ with open(os.path.join('input', 'diretorios.csv'), 'w') as dircsv:
         mensagem = messagebox.askyesno(title='Adcionar linha?', message='Gostaria de selecionar um par de origem e destino?')
 
 '''
-
+'''
 root = tk.Tk()
 canvas = tk.Canvas(root, width=50, height=50)
 canvas.pack()
@@ -35,4 +35,42 @@ def animate():
 
 animate()
 
-root.mainloop()
+root.mainloop()'''
+'''
+Integrando a Barra de Progresso tqdm em uma Interface Tkinter
+Entendendo o Problema:
+
+Você deseja exibir uma barra de progresso criada com a biblioteca tqdm em uma interface gráfica construída com Tkinter. A tqdm é excelente para exibir o progresso no terminal, mas para integrá-la a uma interface gráfica, precisamos de um pouco mais de trabalho.
+
+Solução:
+
+A ideia principal é executar a tarefa que gera a barra de progresso em uma thread separada, enquanto a interface Tkinter continua respondendo. Isso permite atualizar a barra de progresso sem travar a interface.
+
+Código Completo:
+'''
+'''
+import tkinter as tk
+from tqdm import tqdm
+import threading
+import time
+
+def progress_bar():
+    for i in tqdm(range(100), desc="Processando...", unit="it"):
+        # Simulação de uma tarefa demorada
+        time.sleep(0.1)
+        # Atualiza a interface Tkinter (opcional)
+        tk.Label(text={i}).pack()
+        root.update_idletasks()
+
+def start_progress():
+    thread = threading.Thread(target=progress_bar)
+    thread.start()
+
+root = tk.Tk()
+root.title("Barra de Progresso com Tkinter")
+
+# Botão para iniciar a barra de progresso
+button = tk.Button(root, text="Iniciar", command=start_progress)
+button.pack()
+
+root.mainloop()'''
