@@ -1,6 +1,8 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.exc import OperationalError, IntegrityError
+from sqlalchemy import select, text
 import csv
+import asyncio
 class Conexao:
     def __init__(self, nome_completo='', nome='', senha='', email=''):
         self.banco = create_engine('postgresql://postgres:M7cIWJYjxBodNojL@uncertainly-pretty-chimaera.data-1.use1.tembo.io:5432/postgres')
@@ -21,16 +23,17 @@ class Conexao:
     
 class Query():
     def __init__(self, consulta=''):
-        self.banco = create_engine('postgresql://postgres:M7cIWJYjxBodNojL@uncertainly-pretty-chimaera.data-1.use1.tembo.io:5432/postgres')
-    
-    def consultar_senha_por_usuario(self, consulta):
+        self.async_engine = create_async_engine('postgresql+asyncpg://postgres:M7cIWJYjxBodNojL@uncertainly-pretty-chimaera.data-1.use1.tembo.io:5432/postgres')
+        self.async_session = async_sessionmaker(self.async_engine, expire_on_commit=False)
+
+    async def consultar_senha_por_usuario(self, consulta):
         try:
-            with self.banco.connect() as conn:
-                with conn.begin():
-                    self.inserir_dados = text(f"select senha from usuarios where nome_usuario = '{consulta}'")
-                    resultado = conn.execute(self.inserir_dados)
-                    for row in resultado:
-                        return self.tratar_resultado_de_consulta(row)
+            async with self.async_session() as conn:
+                inserir_dados = text(f"select senha from usuarios where nome_usuario = '{consulta}'")
+                result = await conn.execute(inserir_dados)
+                
+                for row in result:
+                    return self.tratar_resultado_de_consulta(row)
         except OperationalError as e:
             return(f"Erro de conexão ou sintaxe SQL: {e}")
         except IntegrityError as e:
@@ -50,7 +53,9 @@ if __name__ == '__main__':
     print(resultado)
 '''
     #consultando dados  
-    consulta = Query()
-    resultado= consulta.consultar_senha_por_usuario('admin')
-    print(resultado)
+    async def main():
+        consulta = Query()
+        resultado= await consulta.consultar_senha_por_usuario('admin')
+        print(resultado)
+    asyncio.run(main())
 

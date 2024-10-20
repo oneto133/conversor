@@ -1,3 +1,4 @@
+import threading
 '''from tkinter import filedialog, messagebox
 import os
 
@@ -74,3 +75,46 @@ button = tk.Button(root, text="Iniciar", command=start_progress)
 button.pack()
 
 root.mainloop()'''
+'''
+import pandas as pd
+
+arquivo = pd.read_csv('diretorios.csv')
+linha = arquivo.iloc[0:]['origem']
+
+print(linha)
+'''
+
+import tkinter as tk
+from tkinter import ttk
+import time
+
+
+# Função para simular o carregamento
+def carregar():
+    valor = 0
+    for c in range(0,6):
+        progress['value'] = valor
+        root.update_idletasks()
+        time.sleep(0.5)
+        valor += 20
+    # ... continuar atualizando a barra de progresso
+
+def atu():
+    threading.Thread(target=carregar).start()
+
+
+# Cria a janela principal
+root = tk.Tk()
+root.title("Tela de Carregamento")
+
+# Cria a barra de progresso
+progress = ttk.Progressbar(root, orient=tk.HORIZONTAL, length=300, mode='determinate')
+progress.pack(pady=20)
+
+# Inicia o carregamento
+atu()
+
+# Após o carregamento, inicia o seu aplicativo principal
+# ...
+
+root.mainloop()

@@ -5,16 +5,27 @@ import Funções
 from Funções import Funcao, Graficos
 from tkinter import filedialog
 from PIL import ImageTk, Image
-from tkinter import dnd, ttk
+from tkinter import dnd, ttk, Button
+from threading import Thread
 
 
 class MeuAplicativo():
     def __init__(self, janela):
         self.janela = janela
         self.janela.configure(bg='white')
-        self.janela.geometry('500x500')
         self.janela.resizable(True, True)
         self.janela.title("Minha janela")
+        self.janela.protocol("WM_DELETE_WINDOW", self.fechar_programa)
+
+        #centralizar a janela
+        largura_da_janela = self.janela.winfo_screenwidth() #obtem a largura da janela
+        altura_da_janela = self.janela.winfo_screenheight() # A Altura
+        janela_width = 500 #Definindo a largura e altura da janela
+        janela_height = 500
+        x = (largura_da_janela - janela_width) // 2 
+        y = (altura_da_janela - janela_height) // 2
+        self.janela.geometry(f'{janela_width}x{janela_height}+{x}+{y}')
+        self.janela.resizable(False, False)
         self.Tipo_de_Arquivo()
 
 
@@ -24,68 +35,64 @@ class MeuAplicativo():
                                     self.janela,text='selecionar arquivo', 
                                     command=self.abrir_gerenciador, width=15, height=1
                                     )
-        self.botão_arquivo.place(x=200, y=50)
+        self.botão_arquivo.place(x=200, y=300)
         self.frame = Frame(self.janela, bg='black', width=500, height=200, bd=2, relief='groove')
-        self.frame.place(x=0, y=150)
+        self.frame.place(x=0, y=60)
         
 
 
     def abrir_gerenciador(self):
-        funcao = Funcao()
-        funcao.abrir_gerenciador_de_arquivos()
-        arquivo = funcao.ler_arquivo_em_cache()
-        if arquivo == "vazio":
+        self.funcao = Funcao()
+        self.funcao.abrir_gerenciador_de_arquivos()
+        self.arquivo = self.funcao.ler_arquivo_em_cache()
+        if self.arquivo == None:
             pass
+
         else:
-            self.mensagem_ok = Label(
-                                    self.janela, text=f'Selecione o arquivo de destino ->',
-                                    bg='black', fg='white', font=('Arial', 10, 'bold')
-                                    )
-            self.mensagem_ok.place(x=140, y=170)
+            self.caminho = Entry(self.janela, width=34)
+            self.caminho.place(x=80, y=175)
+            self.caminho.insert(0, 'Escolher destino')
+            self.buscar = Button(self.janela, text='Buscar destino', bg='blue', fg='white', command=self.salvar_arquivo)
+            self.buscar.place(x=350, y=170)
             imagem = Graficos()
-            self.foto = imagem.Adicionar_imagens_nas_telas(r"C:\conversorpdf\conversor\pdf.png", 50, 60)
+            self.foto = imagem.Adicionar_imagens_nas_telas("pdf.png", 50, 60)
             self.rotulo = Label(self.janela, image=self.foto, bg='black')
-            self.rotulo.place(x=70, y=160)
+            self.rotulo.place(x=120, y=100)
 
-            opções = [
-                'PDF',
-                'DOCX'
-            ]
-            self.combobox = ttk.Combobox(
 
-                self.janela, values=opções, 
-                background='black', foreground='black'
-            
-            )
-            self.combobox.set('Selecionar')
-            self.combobox.place(x=350, y=170)
-            
+    def salvar_arquivo(self, event=None):
+        self.arquivo_docx = filedialog.asksaveasfilename(title = 'Salvar arquivo como',
+        defaultextension='.docx', filetypes=[("Document Files", "*.docx"), ("All Files", "*")])
+        if self.arquivo_docx:
+            self.caminho.delete(0, END)
+            self.caminho.insert(0, self.arquivo_docx)
+            self.buscar.config(text='Converter para Docx', command=self.nao_travar)
 
-            
+    def nao_travar(self):
+        Thread(target=self.converter_arquivo).start()
+        
 
-    def Código(self):
-        self.arquivo = input("Qual o nome do arquivo em pdf? ")
+    def converter_arquivo(self):
+        if not self.arquivo:
+            print("Por favor, selecione um arquivo PDF antes de converter.")
+            return
+
+        if not self.arquivo_docx:
+            print("Por favor, escolha um destino para o arquivo Word.")
+            return
+
         try:
-            resultado = Funções.Verificar_se_existe_o_arquivo(self.arquivo)
-        except KeyboardInterrupt:
-            print("Execução interrompida...")
+            cv = pdf(self.arquivo)
+            cv.convert(self.arquivo_docx, start=0, end=None)
+            cv.close()
+            self.mensagem = Label(self.janela, text="Conversão concluída com sucesso!", bg='black', fg='white').place(x=120, y=220)
+        except Exception as e:
+            self.mensagem['text'] = "Erro durante a conversão: {e}"
 
-        if arquivo_em_pdf[-4:] == '.pdf':
-            arquivo_em_pdf = arquivo_em_pdf
+    def fechar_programa(self):
+        self.janela.quit()
+        self.janela.destroy()
 
-        else:
-            arquivo_em_pdf = f"{arquivo_em_pdf}.pdf"
-
-        arquivo_word = input("Nome do novo arquivo word? ")
-        if arquivo_word[-4:] == 'docx':
-            arquivo_word = arquivo_word
-
-        else:
-            arquivo_word = f"{arquivo_word}.docx"
-
-        cv = pdf(arquivo_em_pdf)
-        cv.convert(arquivo_word)
-        cv.close()
 
 
 if __name__=='__main__':

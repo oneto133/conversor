@@ -2,7 +2,7 @@ from IPython.display import clear_output
 from time import sleep
 import datetime, pytz, os
 from tkinter import filedialog, messagebox
-import pdf2docx
+from pdf2docx import Converter as pdf
 from PIL import ImageTk, Image
 
 class Funcao():
@@ -145,7 +145,8 @@ class Funcao():
     assim fazemos esse trtamento para obter uma conversão correta
     '''
     valor = str(valor)
-    valor = valor.replace(",", ".")
+    valor = valor.replace(")", "").replace("(", "").replace("'", "")
+    
     return valor
 
   def Verificar_se_existe_o_arquivo(self, arquivo):
@@ -162,8 +163,9 @@ class Funcao():
     Criando um arquivo de cache
     '''
     with open(f'{caminho}', 'w') as dircsv:
-        destino = filedialog.askopenfilenames()
-        dircsv.write(f'{destino}\n')
+        destino = filedialog.askopenfilenames(title = 'Salvar arquivo como',
+        defaultextension='.pdf', filetypes=[("Arquivo PDF", "*.pdf"), ("All Files", "*")])
+        dircsv.write(f'origem, destino\n{destino}')
 
   def ler_arquivo_em_cache(self, caminho='diretorios.csv'):
     '''
@@ -176,8 +178,10 @@ class Funcao():
               if c[2:-4] == "":
                 return "vazio"
               else:
-                return c[2:-4]
-
+                return c[2:-3]
+  def converter_arquivo(self, arquivo):
+    cv = pdf(arquivo)
+    cv.convert()
 class Graficos:
   def __init__(self):
     pass
