@@ -83,7 +83,7 @@ linha = arquivo.iloc[0:]['origem']
 
 print(linha)
 '''
-
+'''
 import tkinter as tk
 from tkinter import ttk
 import time
@@ -117,4 +117,37 @@ atu()
 # Após o carregamento, inicia o seu aplicativo principal
 # ...
 
-root.mainloop()
+root.mainloop()'''
+
+'''
+import asyncio
+
+class teste:
+    def __init__(self):
+        asyncio.run(self.main())
+
+    async def Usuario(self):
+        usuario = input("Usuário: ")
+        #consulta o usuário no banco de dados
+        await asyncio.sleep(5)
+        if usuario == "neto":
+            return usuario
+        else:
+            return None
+
+    async def Senha(self):
+        senha = int(input("Senha: "))
+        return senha
+
+    async def main(self):
+        usuario, senha = await asyncio.gather(self.Usuario(), self.Senha())
+        self.comparação(usuario, senha)
+        
+    def comparação(self, usuario, senha):
+        print(f"O usuário é {usuario} e a senha é {senha}")
+        if usuario == "neto" and senha == 36:
+            print("Acesso liberado!")
+        else:
+            print("Acesso negado")
+        
+teste()'''

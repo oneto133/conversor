@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.exc import OperationalError, IntegrityError
+
 from sqlalchemy import select, text
 import csv
 import asyncio
@@ -37,7 +38,9 @@ class Query():
         except OperationalError as e:
             return(f"Erro de conexão ou sintaxe SQL: {e}")
         except IntegrityError as e:
-                return(f"Violação de integridade: {e}")
+            return(f"Violação de integridade: {e}")
+        except ConnectionResetError as e:
+            return (f"Erro de conexão: {e}")
         except Exception as e:
             return(f"Erro inesperado: {e}")
 

@@ -14,6 +14,9 @@ class Tela_De_Login:
         #Configuraçãoes da janela
         self.tela = janela
         self.tela.withdraw()
+        self.senha = 0
+        self.carregado = False
+        self.continuar_animação = True
         self.abrir_tela_de_login()
 
 
@@ -51,13 +54,11 @@ class Tela_De_Login:
         self.Password_Entry.focus_set()
         self.Mensagem_de_alerta['text'] = 'Digite uma senha.'
         
-
     def Pegar_dados(self, event):
-        threading.Thread(target=self.clicar_botao).start()
+        threading.Thread(target=self.comparacao).start()
 
     def clicar(self):
         threading.Thread(target=self.clicar_botao).start()
-
 
     def abre_a_tela_principal(self):
         self.tela_principal = Toplevel(self.janela)
@@ -72,24 +73,30 @@ class Tela_De_Login:
     async def consultar_banco(self, dado):
         consulta = conn.Query()
         senha = await consulta.consultar_senha_por_usuario(dado)
+        self.carregado = True
         return senha
 
         
     def clicar_botao(self):
         dado = self.Users_Entry.get()
-        #self.Mensagem_de_alerta['text'] = 'Carregando...'
-        self.animacao()
-        senha = asyncio.run(self.consultar_banco(dado))
-        print(senha)
-        print(type(senha))
-        if senha == self.Password_Entry.get():
-            self.Mensagem_de_alerta['text'] = "tudo certo"
-            self.janela.withdraw()
-            self.abre_a_tela_principal()
+        if dado:
+            self.senha = asyncio.run(self.consultar_banco(dado))
+            
+    
+    def comparacao(self):
+        if self.carregado == True:
+            if self.Password_Entry.get():
+                if self.senha == self.Password_Entry.get():
+                    self.Mensagem_de_alerta['text'] = "tudo certo"
+                    self.janela.withdraw()
+                    self.abre_a_tela_principal()
+                else:
+                    self.Mensagem_de_alerta['text'] = 'Senha incorreta!' 
 
+            else:
+                self.Mensagem_de_alerta['text'] = 'Digite uma senha!' 
         else:
-            self.Mensagem_de_alerta['text'] = 'senha incorreta!' 
-        print('Botão clicado...')
+            self.janela.after(1000, self.comparacao)
 
      
 
@@ -97,9 +104,8 @@ class Tela_De_Login:
         pontos = "." * (contador % 4)  # Alterna entre '', '.', '..', '...'
         self.Mensagem_de_alerta['text'] = f'Carregando{pontos}'
         contador += 1
-        print(contador)
-        if contador < 35:
-            # Agendar a próxima execução em 200ms (0.2s)
+
+        if contador < 25:
             self.janela.after(200, self.animacao, contador)
 
 
@@ -131,12 +137,12 @@ class Tela_De_Login:
 
         #Botões
         self.Botão_Login = Button(self.janela, text='Entrar', fg='white', bg='blue', relief='raised',
-         width=9, height=1, command=self.clicar).place(x=95, y=160)
+         width=9, height=1, command=self.comparacao).place(x=95, y=160)
 
         #Bind
         self.Users_Entry.bind("<Return>", self.mover_foco)
         self.Password_Entry.bind("<Return>", self.Pegar_dados)
-
+        self.Users_Entry.bind("<Leave>", lambda e: threading.Thread(target=self.clicar_botao).start() if self.Users_Entry.get() else None)
 
 
  

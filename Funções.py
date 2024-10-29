@@ -4,6 +4,7 @@ import datetime, pytz, os
 from tkinter import filedialog, messagebox
 from pdf2docx import Converter as pdf
 from PIL import ImageTk, Image
+from string import ascii_uppercase, ascii_lowercase
 
 class Funcao():
   def __init__(self):
@@ -197,3 +198,10 @@ class Graficos:
     self.imagem = self.imagem.resize((altura, largura))
     self.foto= ImageTk.PhotoImage(self.imagem)
     return self.foto
+
+class Tratamento_de_strings:
+  def alfabeto_para_dicionarios(self, indice=0):
+    alfabeto = ascii_uppercase
+    return alfabeto[indice]
+
+  
