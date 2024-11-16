@@ -5,13 +5,9 @@ from tkinter import filedialog, messagebox
 from pdf2docx import Converter as pdf
 from PIL import ImageTk, Image
 from string import ascii_uppercase, ascii_lowercase
+from datetime import datetime
 
-class Funcao():
-  def __init__(self):
-    pass
-
-
-
+class Horarios:
   def hora(self):
     '''
     Formatting the time because when using the datetime, it was getting a different time zone
@@ -45,7 +41,16 @@ class Funcao():
       return "Bom dia " + hora_formatada
 
 
+  def hora_atual(self):
+    """
+    Show de hour with minutes and seconds
+    """
+    return datetime.now()
 
+
+class Funcao():
+  def __init__(self):
+    pass
 
   def Tratar_Peso_Altura(self, valor, max, tam, nome):
     valor = str(valor)

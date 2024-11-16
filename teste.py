@@ -1,4 +1,4 @@
-import threading
+#import threading
 '''from tkinter import filedialog, messagebox
 import os
 
@@ -151,3 +151,24 @@ class teste:
             print("Acesso negado")
         
 teste()'''
+from yaspin import yaspin
+import time
+import random
+
+# Lista de tarefas simuladas
+tasks = ['Carregando dados...', 'Processando informações...', 'Gerando relatório...']
+
+# Escolher um spinner aleatório
+import time
+from yaspin import yaspin
+
+# Set UTF-8 encoding (optional, depending on your environment)
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
+with yaspin(text="Loading data...") as sp:
+    for i in range(10):
+        time.sleep(0.5)
+        sp.text = f"Processing data: {i+1}/10"
+
+sp.ok("✅ Done!")

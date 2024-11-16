@@ -1,7 +1,7 @@
 #Arquivo telalogin.py
 from tkinter import *
 from PIL import ImageTk, Image
-from time import sleep
+from Funções import Horarios
 import connection_with_db as conn
 import main
 import threading
@@ -16,14 +16,16 @@ class Tela_De_Login:
         self.tela.withdraw()
         self.senha = 0
         self.carregado = False
-        self.continuar_animação = True
         self.abrir_tela_de_login()
 
 
     def abrir_tela_de_login(self):    
         self.janela = Toplevel(self.tela)
         self.janela.title("Conversor de pdf")
-        self.janela.iconbitmap('icone.ico')
+        try:
+            self.janela.iconbitmap('icone.ico')
+        except:
+            print("Imagem não encontrada")
         self.janela.protocol("WM_DELETE_WINDOW", self.fechar_programa)
         
         # Obter a largura e altura da janela
@@ -55,10 +57,10 @@ class Tela_De_Login:
         self.Mensagem_de_alerta['text'] = 'Digite uma senha.'
         
     def Pegar_dados(self, event):
+        hora = Horarios()
+        self.inicio = hora.hora_atual()
+        self.Mensagem_de_alerta['text'] = "Carregando..."
         threading.Thread(target=self.comparacao).start()
-
-    def clicar(self):
-        threading.Thread(target=self.clicar_botao).start()
 
     def abre_a_tela_principal(self):
         self.tela_principal = Toplevel(self.janela)
@@ -74,6 +76,7 @@ class Tela_De_Login:
         consulta = conn.Query()
         senha = await consulta.consultar_senha_por_usuario(dado)
         self.carregado = True
+        print(senha)
         return senha
 
         
@@ -81,43 +84,48 @@ class Tela_De_Login:
         dado = self.Users_Entry.get()
         if dado:
             self.senha = asyncio.run(self.consultar_banco(dado))
-            
-    
+
+
     def comparacao(self):
-        if self.carregado == True:
+        if self.carregado:
+            #hora = Horarios()
+            #fim = hora.hora_atual() - self.inicio
+            #print(fim)
             if self.Password_Entry.get():
                 if self.senha == self.Password_Entry.get():
-                    self.Mensagem_de_alerta['text'] = "tudo certo"
                     self.janela.withdraw()
                     self.abre_a_tela_principal()
                 else:
-                    self.Mensagem_de_alerta['text'] = 'Senha incorreta!' 
-
+                    self.Mensagem_de_alerta['text'] = 'Senha incorreta!'
             else:
                 self.Mensagem_de_alerta['text'] = 'Digite uma senha!' 
         else:
-            self.janela.after(1000, self.comparacao)
+            self.janela.after(200, self.comparacao)
 
      
-
-    def animacao(self, contador=0):
+#Essa função foi retirada por problemas de implementação, logo será acrescentada na pasta de funções, um dia pode ser útil...
+    def animacao(self, contador=22):
         pontos = "." * (contador % 4)  # Alterna entre '', '.', '..', '...'
-        self.Mensagem_de_alerta['text'] = f'Carregando{pontos}'
+        self.carregando = Label(self.janela, text="", font=("Arial", 12, "bold"), bg="gray", fg="white")
+        self.carregando.place(relx=0.5, rely=0.5, anchor="center")
+        self.carregando['text'] = f"Carregando{pontos}"
         contador += 1
 
         if contador < 25:
             self.janela.after(200, self.animacao, contador)
-
+            self.carregando['text'] = ""
+ 
 
     def Elementos_Da_Tela(self):
         #Labels
         self.Login = Label(self.janela, text='Login', font=('Sixtyfour Convergence', 16, 'bold')).place(x=60, y=5)
         self.Users = Label(self.janela, text='Usuário:', font=('Arial', 11, 'bold')).place(x=30, y=50)
         self.Password = Label(self.janela, text='Senha:', font=('Arial', 11, 'bold')).place(x=30, y=100)
-        self.imagem = Image.open('Icone.ico')
+        self.imagem = Image.open('icone.ico')
         self.imagem = self.imagem.resize((60, 30))
         self.foto= ImageTk.PhotoImage(self.imagem)
         self.rotulo = Label(self.janela, image=self.foto)
+        self.rotulo.place(x=140, y=5)
         #Mostrar senha
         self.verificar_senha = BooleanVar()
         self.Checkbutton = Checkbutton(self.janela, text='Mostrar senha', variable=self.verificar_senha, command=self.Mostrar_Senha)
@@ -132,7 +140,7 @@ class Tela_De_Login:
         self.Users_Entry.place(x=100, y=53)
         self.Password_Entry.place(x=100, y=103)
         self.Mensagem_de_alerta.place(x= 95, y= 143)
-        self.rotulo.place(x=140, y= 5)
+        #self.rotulo.place(x=140, y= 5)
         self.Checkbutton.place(x=95, y = 125)
 
         #Botões
